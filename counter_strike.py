@@ -89,7 +89,7 @@ Nova = Gun("Nova", 1200, 26)
 mag7 = Gun("mag7", 1300, 30)
 XM1014 = Gun("XM1014", 2000, 25)
 PP_Bizon = Gun("PP-Bizon", 1400, 27)
-FAMAS = Gun("FAMAS", 2050, 30)
+Famas = Gun("FAMAS", 2050, 30)
 
 guns = [ak47, awp, m21, m4a1, shotgun, Pulyimot, Nova, mag7, PP_Bizon, FAMAS]
 
