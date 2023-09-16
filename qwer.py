@@ -1,227 +1,130 @@
-import pygame
+import turtle
 import random
-import math
 
-# Initialize Pygame
-pygame.init()
-player_image = pygame.image.load("../spaceship.png")
-# Set up the game window
-screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Asteroids")
+w = 500
+h = 500
+food_size = 10
+delay = 100
 
-# Set up the colors
-WHITE = (255, 255, 255)
+offsets = {
+    "up": (0, 20),
+    "down": (0, -20),
+    "left": (-20, 0),
+    "right": (20, 0)
+}
 
-# Set up the player
-player_image = pygame.image.load("spaceship.png")
-player_rect = player_image.get_rect()
-player_rect.center = (400, 300)
-player_angle = 0
 
-# Set up the bullets
-bullet_image = pygame.image.load("bullet.png")
-bullet_rect = bullet_image.get_rect()
-bullet_rect.center = (player_rect.centerx, player_rect.centery)
-bullet_angle = player_angle
-bullet_speed = 5
-bullet_state = "ready"
+def reset():
+    global snake, snake_dir, food_position, pen
+    snake = [[0, 0], [0, 20], [0, 40], [0, 60], [0, 80]]
+    snake_dir = "up"
+    food_position = get_random_food_position()
+    food.goto(food_position)
+    move_snake()
 
-# Set up the asteroids
-asteroid_images = [pygame.image.load("asteroid1.png"), pygame.image.load("asteroid2.png"), pygame.image.load("asteroid3.png")]
-asteroids = []
-num_asteroids = 6
 
-for i in range(num_asteroids):
-    asteroid_rect = asteroid_images[random.randint(0, 2)].get_rect()
-    asteroid_rect.x = random.randint(0, 800)
-    asteroid_rect.y = random.randint(0, 600)
-    asteroid_angle = random.randint(0, 360)
-    asteroid_rotation = random.randint(-3, 3)
-    asteroids.append((asteroid_rect, asteroid_angle, asteroid_rotation))
+def move_snake():
+    global snake_dir
 
-# Game loop
-running = True
-clock = pygame.time.Clock()
+    new_head = snake[-1].copy()
+    new_head[0] = snake[-1][0] + offsets[snake_dir][0]
+    new_head[1] = snake[-1][1] + offsets[snake_dir][1]
 
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    if new_head in snake[:-1]:
+        reset()
+    else:
+        snake.append(new_head)
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                player_angle += 5
-            if event.key == pygame.K_RIGHT:
-                player_angle -= 5
-            if event.key == pygame.K_SPACE and bullet_state == "ready":
-                bullet_rect.center = (player_rect.centerx, player_rect.centery)
-                bullet_angle = player_angle
-                bullet_state = "fire"
+        if not food_collision():
+            snake.pop(0)
 
-    # Rotate the player
-    player_rotated = pygame.transform.rotate(player_image, player_angle)
-    player_rect_rotated = player_rotated.get_rect(center=player_rect.center)
+        if snake[-1][0] > w / 2:
+            snake[-1][0] -= w
+        elif snake[-1][0] < - w / 2:
+            snake[-1][0] += w
+        elif snake[-1][1] > h / 2:
+            snake[-1][1] -= h
+        elif snake[-1][1] < -h / 2:
+            snake[-1][1] += h
 
-    # Move the player
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
-        dx = math.cos(math.radians(player_angle)) * 5
-        dy = math.sin(math.radians(player_angle)) * -5
-        player_rect.move_ip(dx, dy)
+        pen.clearstamps()
 
-    # Move the bullet
-    if bullet_state == "fire":
-        dx = math.cos(math.radians(bullet_angle)) * bullet_speed
-        dy = math.sin(math.radians(bullet_angle)) * -bullet_speed
-        bullet_rect.move_ip(dx, dy)
+        for segment in snake:
+            pen.goto(segment[0], segment[1])
+            pen.stamp()
 
-        if bullet_rect.left < 0 or bullet_rect.right > 800 or bullet_rect.top < 0 or bullet_rect.bottom > 600:
-            bullet_state = "ready"
+        screen.update()
 
-    # Draw on the screen
-    screen.fill((0, 0, 0))
-    screen.blit(player_rotated, player_rect_rotated)
-    if bullet_state == "fire":
-        screen.blit(bullet_image, bullet_rect)
+        turtle.ontimer(move_snake, delay)
 
-    for asteroid in asteroids:
-        asteroid_rect, asteroid_angle, asteroid_rotation = asteroid
-        asteroid_rotated = pygame.transform.rotate(asteroid_images[random.randint(0, 2)], asteroid_angle)
-        asteroid_rect_rotated = asteroid_rotated.get_rect(center=asteroid_rect.center)
-        screen.blit(asteroid_rotated, asteroid_rect_rotated)
 
-        asteroid_rect.move_ip(asteroid_rotation, 2)
+def food_collision():
+    global food_position
+    if get_distance(snake[-1], food_position) < 20:
+        food_position = get_random_food_position()
+        food.goto(food_position)
+        return True
+    return False
 
-        if asteroid_rect.left > 800:
-            asteroid_rect.x = 0 - asteroid_rect.width
-        if asteroid_rect.right < 0:
-            asteroid_rect.x = 800
-        if asteroid_rect.top > 600:
-            asteroid_rect.y = 0 - asteroid_rect.height
-        if asteroid_rect.bottom < 0:
-            asteroid_rect.y = 600
 
-        if bullet_rect.colliderect(asteroid_rect):
-            asteroid_rect.x = random.randint(0, 800)
-            asteroid_rect.y = random.randint(0, 600)
-            bullet_state = "ready"
+def get_random_food_position():
+    x = random.randint(- w / 2 + food_size, w / 2 - food_size)
+    y = random.randint(- h / 2 + food_size, h / 2 - food_size)
+    return (x, y)
 
-    pygame.display.flip()
-    clock.tick(60)
 
-# Quit the game
-pygame.quit()
+def get_distance(pos1, pos2):
+    x1, y1 = pos1
+    x2, y2 = pos2
+    distance = ((y2 - y1) ** 2 + (x2 - x1) ** 2) ** 0.5
+    return distance
 
-import pygame
-import random
-import math
 
-# Initialize Pygame
-pygame.init()
+def go_up():
+    global snake_dir
+    if snake_dir != "down":
+        snake_dir = "up"
 
-# Set up the game window
-screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Asteroids")
 
-# Set up the colors
-WHITE = (255, 255, 255)
+def go_right():
+    global snake_dir
+    if snake_dir != "left":
+        snake_dir = "right"
 
-# Set up the player
-player_image = pygame.image.load("spaceship.png")
-player_rect = player_image.get_rect()
-player_rect.center = (400, 300)
-player_angle = 0
 
-# Set up the bullets
-bullet_image = pygame.image.load("bullet.png")
-bullet_rect = bullet_image.get_rect()
-bullet_rect.center = (player_rect.centerx, player_rect.centery)
-bullet_angle = player_angle
-bullet_speed = 5
-bullet_state = "ready"
+def go_down():
+    global snake_dir
+    if snake_dir != "up":
+        snake_dir = "down"
 
-# Set up the asteroids
-asteroid_images = [pygame.image.load("asteroid1.png"), pygame.image.load("asteroid2.png"), pygame.image.load("asteroid3.png")]
-asteroids = []
-num_asteroids = 6
 
-for i in range(num_asteroids):
-    asteroid_rect = asteroid_images[random.randint(0, 2)].get_rect()
-    asteroid_rect.x = random.randint(0, 800)
-    asteroid_rect.y = random.randint(0, 600)
-    asteroid_angle = random.randint(0, 360)
-    asteroid_rotation = random.randint(-3, 3)
-    asteroids.append((asteroid_rect, asteroid_angle, asteroid_rotation))
+def go_left():
+    global snake_dir
+    if snake_dir != "right":
+        snake_dir = "left"
 
-# Game loop
-running = True
-clock = pygame.time.Clock()
 
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+screen = turtle.Screen()
+screen.setup(w, h)
+screen.title("Snake")
+screen.bgcolor("blue")
+screen.setup(500, 500)
+screen.tracer(0)
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                player_angle += 5
-            if event.key == pygame.K_RIGHT:
-                player_angle -= 5
-            if event.key == pygame.K_SPACE and bullet_state == "ready":
-                bullet_rect.center = (player_rect.centerx, player_rect.centery)
-                bullet_angle = player_angle
-                bullet_state = "fire"
+pen = turtle.Turtle("square")
+pen.penup()
 
-    # Rotate the player
-    player_rotated = pygame.transform.rotate(player_image, player_angle)
-    player_rect_rotated = player_rotated.get_rect(center=player_rect.center)
+food = turtle.Turtle()
+food.shape("square")
+food.color("yellow")
+food.shapesize(food_size / 20)
+food.penup()
 
-    # Move the player
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
-        dx = math.cos(math.radians(player_angle)) * 5
-        dy = math.sin(math.radians(player_angle)) * -5
-        player_rect.move_ip(dx, dy)
+screen.listen()
+screen.onkey(go_up, "Up")
+screen.onkey(go_right, "Right")
+screen.onkey(go_down, "Down")
+screen.onkey(go_left, "Left")
 
-    # Move the bullet
-    if bullet_state == "fire":
-        dx = math.cos(math.radians(bullet_angle)) * bullet_speed
-        dy = math.sin(math.radians(bullet_angle)) * -bullet_speed
-        bullet_rect.move_ip(dx, dy)
-
-        if bullet_rect.left < 0 or bullet_rect.right > 800 or bullet_rect.top < 0 or bullet_rect.bottom > 600:
-            bullet_state = "ready"
-
-    # Draw on the screen
-    screen.fill((0, 0, 0))
-    screen.blit(player_rotated, player_rect_rotated)
-    if bullet_state == "fire":
-        screen.blit(bullet_image, bullet_rect)
-
-    for asteroid in asteroids:
-        asteroid_rect, asteroid_angle, asteroid_rotation = asteroid
-        asteroid_rotated = pygame.transform.rotate(asteroid_images[random.randint(0, 2)], asteroid_angle)
-        asteroid_rect_rotated = asteroid_rotated.get_rect(center=asteroid_rect.center)
-        screen.blit(asteroid_rotated, asteroid_rect_rotated)
-
-        asteroid_rect.move_ip(asteroid_rotation, 2)
-
-        if asteroid_rect.left > 800:
-            asteroid_rect.x = 0 - asteroid_rect.width
-        if asteroid_rect.right < 0:
-            asteroid_rect.x = 800
-        if asteroid_rect.top > 600:
-            asteroid_rect.y = 0 - asteroid_rect.height
-        if asteroid_rect.bottom < 0:
-            asteroid_rect.y = 600
-
-        if bullet_rect.colliderect(asteroid_rect):
-            asteroid_rect.x = random.randint(0, 800)
-            asteroid_rect.y = random.randint(0, 600)
-            bullet_state = "ready"
-
-    pygame.display.flip()
-    clock.tick(60)
-
-# Quit the game
-pygame.quit()
+reset()
+turtle.done()
