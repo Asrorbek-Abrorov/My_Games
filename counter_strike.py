@@ -80,13 +80,18 @@ class CounterTerrorist(Player):
 
 
 ak47 = Gun("ak47", 2700, 35)
-awp = Gun("awp", 2700, 100)
+awp = Gun("awp", 4750, 100)
 m21 = Gun("m21", 2700, 70)
 m4a1 = Gun("m4a1", 2700, 35)
 shotgun = Gun("shotgun", 2700, 50)
 Pulyimot = Gun("Pulyimot", 2700, 50)
+Nova = Gun("Nova", 1200, 26)
+mag7 = Gun("mag7", 1300, 30)
+XM1014 = Gun("XM1014", 2000, 25)
+PP_Bizon = Gun("PP-Bizon", 1400, 27)
+FAMAS = Gun("FAMAS", 2050, 30)
 
-guns = [ak47, awp, m21, m4a1, shotgun, Pulyimot]
+guns = [ak47, awp, m21, m4a1, shotgun, Pulyimot, Nova, mag7, PP_Bizon, FAMAS]
 
 usp = Gun("usp", 0, 15)
 glock = Gun("glock", 0, 10)
@@ -94,7 +99,7 @@ glock = Gun("glock", 0, 10)
 player1 = CounterTerrorist("Asror", 100, 10000)
 player2 = Terrorist("Asilbek", 100, 10000)
 player3 = CounterTerrorist("Javohir", 100, 10000)
-player4 = Terrorist("Mike", 100, 10000)
+player4 = Terrorist("Dadajon", 100, 10000)
 
 players = [player1, player2, player3, player4]
 
@@ -158,5 +163,3 @@ while rounds != 3:
 
 print(f"Counter Terrorists: {wins_ct[0]} wins")
 print(f"Terrorists: {wins_ct[1]} wins")
-
-
