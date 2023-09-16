@@ -79,19 +79,19 @@ class CounterTerrorist(Player):
             return False
 
 
-ak47 = Gun("ak47", 2700, 35)
+ak47 = Gun("ak47", 2700, 30)
 awp = Gun("awp", 4750, 100)
 m21 = Gun("m21", 2700, 70)
-m4a1 = Gun("m4a1", 2700, 35)
+m4a1 = Gun("m4a1", 2700, 30)
 shotgun = Gun("shotgun", 2700, 50)
 Pulyimot = Gun("Pulyimot", 2700, 50)
-Nova = Gun("Nova", 1200, 26)
-mag7 = Gun("mag7", 1300, 30)
-XM1014 = Gun("XM1014", 2000, 25)
-PP_Bizon = Gun("PP-Bizon", 1400, 27)
-Famas = Gun("FAMAS", 2050, 30)
+Nova = Gun("Nova", 1200, 40)
+mag7 = Gun("mag7", 1300, 50)
+XM1014 = Gun("XM1014", 2000, 40)
+PP_Bizon = Gun("PP-Bizon", 1400, 40)
+Famas = Gun("FAMAS", 2050, 50)
 
-guns = [ak47, awp, m21, m4a1, shotgun, Pulyimot, Nova, mag7, PP_Bizon, FAMAS]
+guns = [ak47, awp, m21, m4a1, shotgun, Pulyimot, Nova, mag7, PP_Bizon, Famas, XM1014]
 
 usp = Gun("usp", 0, 15)
 glock = Gun("glock", 0, 10)
@@ -106,7 +106,7 @@ players = [player1, player2, player3, player4]
 rounds = 0
 wins_ct = [0, 0]
 
-while rounds != 3:
+while rounds != 15:
     random.shuffle(guns)
     player1.buy(guns, usp)
 
