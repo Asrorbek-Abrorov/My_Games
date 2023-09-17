@@ -8,16 +8,6 @@ def display_board(board):
         print("\n-------------")
 
 
-def display_board(board):
-    print("-------------")
-    for row in board:
-        print("|", end=" ")
-        for cell in row:
-            symbol = " " if cell == 0 else cell
-            print(symbol, end=" | ")
-        print("\n-------------")
-
-
 def initialize_board():
     return [[" " for _ in range(3)] for _ in range(3)]
 
