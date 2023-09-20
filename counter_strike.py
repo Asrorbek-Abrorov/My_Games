@@ -97,9 +97,9 @@ usp = Gun("usp", 0, 15)
 glock = Gun("glock", 0, 10)
 
 player1 = CounterTerrorist("Asror", 100, 10000)
-player2 = Terrorist("Asilbek", 100, 10000)
-player3 = CounterTerrorist("Javohir", 100, 10000)
-player4 = Terrorist("Dadajon", 100, 10000)
+player2 = Terrorist("Maxmud", 100, 10000)
+player3 = CounterTerrorist("Hasan", 100, 10000)
+player4 = Terrorist("Shokir", 100, 10000)
 
 players = [player1, player2, player3, player4]
 
